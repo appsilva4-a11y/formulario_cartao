@@ -1,0 +1,549 @@
+[index.html.html](https://github.com/user-attachments/files/21901776/index.html.html)
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Solicitação de Cartão Corporativo</title>
+    <!-- Biblioteca jsPDF para gerar o documento PDF no navegador -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        /* Estilos gerais para a página */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Container principal do formulário */
+        .container {
+            max-width: 850px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Cabeçalho do formulário com a nova cor de fundo */
+        .header {
+            background-color: #4169E1; /* Azul Royal */
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin-top: 8px;
+            opacity: 0.95;
+            font-size: 1.1em;
+        }
+
+        /* Área do formulário */
+        .form-container {
+            padding: 30px 40px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        /* Grid customizado para o endereço */
+        .address-grid {
+            display: grid;
+            gap: 25px;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .address-grid .form-group:nth-child(2) {
+            grid-column: span 2;
+        }
+         .address-grid .form-group:nth-child(5) {
+            grid-column: span 2;
+        }
+
+
+        .form-group {
+            margin-bottom: 22px;
+            position: relative;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .required-star {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            background-color: #f9f9f9;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4169E1;
+            box-shadow: 0 0 8px rgba(65, 105, 225, 0.2);
+            background-color: #fff;
+        }
+        
+        .char-counter, small {
+            font-size: 0.85em;
+            color: #777;
+            margin-top: 6px;
+            display: block;
+        }
+
+        /* Botões */
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background-color: #4169E1;
+            box-shadow: 0 4px 15px rgba(65, 105, 225, 0.4);
+        }
+        .btn-primary:hover {
+            background-color: #3557b4;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(65, 105, 225, 0.5);
+        }
+        
+        .btn-secondary {
+            background-color: #7f8c8d;
+             box-shadow: 0 4px 15px rgba(127, 140, 141, 0.4);
+        }
+        .btn-secondary:hover {
+            background-color: #6c7a7b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(127, 140, 141, 0.5);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Design responsivo para telas menores */
+        @media (max-width: 768px) {
+            .form-row, .address-grid {
+                grid-template-columns: 1fr;
+            }
+            .address-grid .form-group:nth-child(2),
+            .address-grid .form-group:nth-child(5) {
+                grid-column: span 1;
+            }
+            .form-container {
+                padding: 25px;
+            }
+            .header {
+                padding: 40px 25px;
+            }
+            .btn-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Fundação Universidade de Caxias do Sul</h1>
+            <p>Formulário de Solicitação de Cartão</p>
+        </div>
+
+        <div class="form-container">
+            <form id="solicitacaoForm" onsubmit="return false;">
+                <!-- CAMPOS REORDENADOS CONFORME SOLICITAÇÃO -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nome">Nome Completo <span class="required-star">*</span></label>
+                        <input type="text" id="nome" name="nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cpf">CPF <span class="required-star">*</span></label>
+                        <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="dataNascimento">Data de Nascimento <span class="required-star">*</span></label>
+                        <input type="date" id="dataNascimento" name="dataNascimento" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">E-mail <span class="required-star">*</span></label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                     <div class="form-group">
+                        <label for="telefone">Telefone/Ramal</label>
+                        <input type="tel" id="telefone" name="telefone" placeholder="(xx) xxxx-xxxx">
+                    </div>
+                    <div class="form-group">
+                        <label for="celular">Celular <span class="required-star">*</span></label>
+                        <input type="tel" id="celular" name="celular" placeholder="(00) 00000-0000" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="setor">Mantida/Campi/Setor</label>
+                        <input type="text" id="setor" name="setor">
+                    </div>
+                    <div class="form-group">
+                        <label for="cargo">Cargo/Função</label>
+                        <input type="text" id="cargo" name="cargo">
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="nomeCartao">Nome impresso no cartão <span class="required-star">*</span></label>
+                    <input type="text" id="nomeCartao" name="nomeCartao" maxlength="24" placeholder="Ex: Lucas C Pereira" required>
+                    <span class="char-counter">0/24 caracteres</span>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="limite">Limite de gastos do cartão <span class="required-star">*</span></label>
+                    <select id="limite" name="limite" required>
+                        <option value="">Selecione um valor</option>
+                        <option value="500">R$ 500,00</option>
+                        <option value="1000">R$ 1.000,00</option>
+                        <option value="2000">R$ 2.000,00</option>
+                    </select>
+                    <small>O limite de gastos do cartão pode ser igual ou menor do que o limite solicitado.</small>
+                </div>
+                
+                <div class="form-group full-width" style="margin-bottom: 10px;">
+                    <label style="font-size: 1.1em; color: #333;">Onde deseja receber o cartão?</label>
+                </div>
+
+                <div class="address-grid">
+                    <div class="form-group">
+                        <label for="cep">CEP <span class="required-star">*</span></label>
+                        <input type="text" id="cep" name="cep" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="rua">Rua <span class="required-star">*</span></label>
+                        <input type="text" id="rua" name="rua" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="numero">Nº <span class="required-star">*</span></label>
+                        <input type="text" id="numero" name="numero" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bairro">Bairro <span class="required-star">*</span></label>
+                        <input type="text" id="bairro" name="bairro" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="complemento">Complemento</label>
+                        <input type="text" id="complemento" name="complemento">
+                    </div>
+                    <div class="form-group">
+                        <label for="cidade">Cidade <span class="required-star">*</span></label>
+                        <input type="text" id="cidade" name="cidade" required>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="observacoes">Observações</label>
+                    <textarea id="observacoes" name="observacoes"></textarea>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="limparFormulario()">Limpar</button>
+                    <button type="button" class="btn btn-primary" onclick="gerarPDF()">Gerar PDF para Assinatura</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- FUNÇÕES DE VALIDAÇÃO E FORMATAÇÃO ---
+
+        function validarCPF(cpf) {
+            cpf = cpf.replace(/[^\d]+/g, '');
+            if (cpf === '' || cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+            let soma = 0, resto;
+            for (let i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+            resto = (soma * 10) % 11;
+            if ((resto === 10) || (resto === 11)) resto = 0;
+            if (resto !== parseInt(cpf.substring(9, 10))) return false;
+            soma = 0;
+            for (let i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+            resto = (soma * 10) % 11;
+            if ((resto === 10) || (resto === 11)) resto = 0;
+            if (resto !== parseInt(cpf.substring(10, 11))) return false;
+            return true;
+        }
+
+        document.getElementById('cpf').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '').slice(0, 11);
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            e.target.value = value;
+        });
+
+        const phoneMask = (value) => {
+            if (!value) return "";
+            value = value.replace(/\D/g,'').slice(0, 11);
+            if (value.length > 10) {
+                value = value.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+            } else {
+                value = value.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+            }
+            return value;
+        }
+
+        const handlePhoneInput = (event) => {
+            event.target.value = phoneMask(event.target.value);
+        }
+        document.getElementById('celular').addEventListener('input', handlePhoneInput);
+        document.getElementById('telefone').addEventListener('input', handlePhoneInput);
+        
+        document.getElementById('nomeCartao').addEventListener('input', function (e) {
+            const counter = document.querySelector('.char-counter');
+            const currentLength = e.target.value.length;
+            counter.textContent = `${currentLength}/24 caracteres`;
+        });
+
+        // --- API VIA CEP ---
+        const cepInput = document.getElementById('cep');
+        cepInput.addEventListener('blur', async (e) => {
+            const cep = e.target.value.replace(/\D/g, '');
+            if (cep.length !== 8) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                const data = await response.json();
+
+                if (data.erro) {
+                    alert('CEP não encontrado.');
+                    return;
+                }
+
+                document.getElementById('rua').value = data.logradouro;
+                document.getElementById('bairro').value = data.bairro;
+                document.getElementById('cidade').value = data.localidade;
+                document.getElementById('numero').focus(); // Foco no número após preencher
+            } catch (error) {
+                alert('Não foi possível buscar o CEP. Tente novamente.');
+            }
+        });
+        
+        // --- FUNÇÕES PRINCIPAIS DO FORMULÁRIO ---
+
+        function validarFormulario() {
+            const form = document.getElementById('solicitacaoForm');
+            for (const field of form.querySelectorAll('[required]')) {
+                if (!field.value.trim()) {
+                    alert(`O campo "${field.labels[0].innerText.replace('*','').trim()}" é obrigatório.`);
+                    field.focus();
+                    return false;
+                }
+            }
+
+            const emailField = document.getElementById('email');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(emailField.value)) {
+                alert('Por favor, insira um e-mail válido.');
+                emailField.focus();
+                return false;
+            }
+
+            const cpfField = document.getElementById('cpf');
+            if (!validarCPF(cpfField.value)) {
+                alert('Por favor, insira um CPF válido.');
+                cpfField.focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        function limparFormulario() {
+            document.getElementById('solicitacaoForm').reset();
+            document.querySelector('.char-counter').textContent = '0/24 caracteres';
+        }
+
+        function gerarPDF() {
+            if (!validarFormulario()) {
+                return;
+            }
+
+            const dados = {
+                nome: document.getElementById('nome').value,
+                cpf: document.getElementById('cpf').value,
+                dataNascimento: document.getElementById('dataNascimento').value.split('-').reverse().join('/'),
+                email: document.getElementById('email').value,
+                telefone: document.getElementById('telefone').value || "Não informado",
+                celular: document.getElementById('celular').value,
+                setor: document.getElementById('setor').value || "Não informado",
+                cargo: document.getElementById('cargo').value || "Não informado",
+                nomeCartao: document.getElementById('nomeCartao').value,
+                limite: parseFloat(document.getElementById('limite').value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+                cep: document.getElementById('cep').value,
+                rua: document.getElementById('rua').value,
+                numero: document.getElementById('numero').value,
+                bairro: document.getElementById('bairro').value,
+                complemento: document.getElementById('complemento').value || "Não informado",
+                cidade: document.getElementById('cidade').value,
+                observacoes: document.getElementById('observacoes').value || "Nenhuma",
+            };
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+
+            // --- MONTAGEM DO DOCUMENTO PDF ---
+            
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.text('Fundação Universidade de Caxias do Sul', 105, 15, { align: 'center' });
+            
+            doc.setFontSize(16);
+            doc.text('TERMO DE SOLICITAÇÃO E RESPONSABILIDADE', 105, 25, { align: 'center' });
+
+            let y = 40;
+            // DADOS PESSOAIS E PROFISSIONAIS
+            doc.setFontSize(12);
+            doc.text('1. DADOS DO PORTADOR', 15, y);
+            doc.setLineWidth(0.5);
+            doc.line(15, y + 2, 195, y + 2);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            y += 8;
+            doc.text(`Nome Completo: ${dados.nome}`, 15, y);
+            y += 6;
+            doc.text(`CPF: ${dados.cpf}`, 15, y);
+            doc.text(`Data de Nascimento: ${dados.dataNascimento}`, 105, y);
+            y += 6;
+            doc.text(`E-mail: ${dados.email}`, 15, y);
+            y += 6;
+            doc.text(`Telefone/Ramal: ${dados.telefone}`, 15, y);
+            doc.text(`Celular: ${dados.celular}`, 105, y);
+            y += 6;
+            doc.text(`Mantida/Campi/Setor: ${dados.setor}`, 15, y);
+            doc.text(`Cargo/Função: ${dados.cargo}`, 105, y);
+
+            // ENDEREÇO DE ENTREGA
+            y += 10;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(12);
+            doc.text('2. ENDEREÇO DE ENTREGA', 15, y);
+            doc.line(15, y + 2, 195, y + 2);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            y += 8;
+            doc.text(`CEP: ${dados.cep}`, 15, y);
+            doc.text(`Rua: ${dados.rua}`, 60, y);
+            y += 6;
+            doc.text(`Nº: ${dados.numero}`, 15, y);
+            doc.text(`Bairro: ${dados.bairro}`, 60, y);
+            y += 6;
+            doc.text(`Complemento: ${dados.complemento}`, 15, y);
+            doc.text(`Cidade: ${dados.cidade}`, 105, y);
+
+            // DETALHES DO CARTÃO
+            y += 10;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(12);
+            doc.text('3. DETALHES DA SOLICITAÇÃO DO CARTÃO', 15, y);
+            doc.line(15, y + 2, 195, y + 2);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            y += 8;
+            doc.text(`Nome a ser impresso no cartão: ${dados.nomeCartao}`, 15, y);
+            y += 6;
+            doc.text(`Limite de gastos solicitado: ${dados.limite}`, 15, y);
+            y += 6;
+            doc.text(`Observações: ${dados.observacoes}`, 15, y);
+            
+            // DECLARAÇÃO
+            y += 12;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(12);
+            doc.text('4. DECLARAÇÃO DE RESPONSABILIDADE', 15, y);
+            doc.line(15, y + 2, 195, y + 2);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            y += 8;
+            const termos = `Declaro para os devidos fins que solicito o cartão corporativo e estou ciente das políticas de utilização do mesmo. Comprometo-me, caso a solicitação seja aprovada, a utilizá-lo exclusivamente para despesas corporativas autorizadas e a prestar contas dos gastos conforme as normas internas da instituição.`;
+            const splitTermos = doc.splitTextToSize(termos, 180);
+            doc.text(splitTermos, 15, y);
+
+            // ASSINATURA
+            y = 255;
+            doc.line(40, y, 170, y);
+            doc.text('Assinatura do Portador', 105, y + 5, { align: 'center' });
+            
+            // RODAPÉ
+            const dataAtual = new Date().toLocaleDateString('pt-BR');
+            doc.setFontSize(9);
+            doc.setTextColor(150);
+            doc.text(`Documento gerado em Caxias do Sul, ${dataAtual}.`, 105, 280, { align: 'center' });
+
+            doc.save(`solicitacao_cartao_${dados.nome.split(' ')[0]}.pdf`);
+        }
+    </script>
+</body>
+</html>
